@@ -2,40 +2,44 @@
 #include<string.h>
 struct pass_info {
     char username[50];
-    char origin_pw[200];
-    char domains[200];
-    char prompt[200];
-    char telephone[20];
+    char origin_pw[40];
+    char domains[20];
+    char prompt[20];
+    char telephone[15];
 };
-void data_write(struct pass_info *mem, FILE *wr);  //写入文件函数
-void data_show(struct pass_info *mem, int count);   //展示数据
+void data_add(struct pass_info *men, int count);  //手动添加数据
+void data_show(struct pass_info *mem, int count);   //展示当前数据
+void data_save_to_file(struct pass_info *mem, int count);  //写入文件函数
 int main()
 {
     struct pass_info users[20];
-    int i,k,num;
+    int num;
     char useless_char;
-    FILE *fp;
-    fp=fopen("pssv.txt","w+");
-    printf("How many users do you want to input?\n");
+    printf("How many users do you want to add?\n");
     scanf("%d%c",&num,&useless_char);
-    for(i=0;i<num;i++)
-    {
-        printf("Now is the %d data\n",i+1);
-        printf("Please enter the username:");
-        gets(users[i].username);
-        printf("Please enter the password:");
-        gets(users[i].origin_pw);
-        printf("Please enter the domain:");
-        gets(users[i].domains);
-        printf("Please enter the prompt:");
-        gets(users[i].prompt);
-        printf("Please enter the telephone:");
-        gets(users[i].telephone);
-    }
+    data_add(users,num);
     data_show(users,num);
-    for(k=0;k<num;k++)  data_write(users+k,fp);
-    fclose(fp);
+    data_save_to_file(users,num);
     return 0;
+}
+void data_add(struct pass_info *mem, int count)
+{
+    int flag;
+    for(flag=0;flag<count;flag++,mem++)
+    {
+        printf("Now is the no.%d data\n",flag+1);
+        printf("Please enter the username:");
+        gets(mem->username);
+        printf("Please enter the password:");
+        gets(mem->origin_pw);
+        printf("Please enter the domain:");
+        gets(mem->domains);
+        printf("Please enter the prompt:");
+        gets(mem->prompt);
+        printf("Please enter the telephone:");
+        gets(mem->telephone);
+    }
+    return;
 }
 void data_show(struct pass_info *mem, int count)
 {
@@ -52,19 +56,28 @@ void data_show(struct pass_info *mem, int count)
         puts(mem->prompt);
         printf("The telephone is: ");
         puts(mem->telephone);
+        printf("\n");
     }
+    return;
 }
-void data_write(struct pass_info *mem, FILE *wr)
+void data_save_to_file(struct pass_info *mem, int count)
 {
-    fprintf(wr,"%s",mem->username);
-    putc('\n',wr);
-    fprintf(wr,"%s",mem->origin_pw);
-    putc('\n',wr);
-    fprintf(wr,"%s",mem->domains);
-    putc('\n',wr);
-    fprintf(wr,"%s",mem->prompt);
-    putc('\n',wr);
-    fprintf(wr,"%s",mem->telephone);
-    putc('\n',wr);
+    int flag;
+    FILE *wr;
+    wr=fopen("pssv.txt","w+");
+    for(flag=0;flag<count;flag++,mem++)
+    {
+        fprintf(wr,"%s",mem->username);
+        putc('\n',wr);
+        fprintf(wr,"%s",mem->origin_pw);
+        putc('\n',wr);
+        fprintf(wr,"%s",mem->domains);
+        putc('\n',wr);
+        fprintf(wr,"%s",mem->prompt);
+        putc('\n',wr);
+        fprintf(wr,"%s",mem->telephone);
+        putc('\n',wr);
+    }
+    fclose(wr);
     return;
 }
