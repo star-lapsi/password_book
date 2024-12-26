@@ -1,25 +1,8 @@
 #include<stdio.h>
 #include<string.h>
-#include"encry.h"
+#include"mainframe.h"
+#include"encrypt\encry.h"
 
-struct pass_info {
-    int xuhao;
-    char username[20];
-    char origin_pw[40];
-    char domains[20];
-    char prompt[40];
-    char telephone[20];
-    int encrp_num;
-};
-
-int welcome_windows();  //功能选择界面
-int data_read_pre(struct pass_info *mem_rdp, int count_rd_p);  //导入数据准备
-int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd);    //导入数据函数
-int data_add(struct pass_info *mem, int count_ad);  //手动添加数据
-void data_list(struct pass_info *mem_ls, int count_ls);   //展示当前数据
-void data_save_pre(struct pass_info *mem_svp, int count_svp);    //写入数据准备
-void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv);  //写入文件函数
-void finish_windows();  //结束缓冲界面
 int main()
 {
     struct pass_info users[50]={ 0 };
@@ -32,25 +15,15 @@ int main()
         if(if_tag==1)     data_list(users,num_ma);
         else if(if_tag==2)  num_ma=data_add(users,num_ma);
         else if(if_tag==3)  num_ma=data_read_pre(users,num_ma);
-        else if(if_tag==4)  data_save_pre(users,num_ma);
+        else if(if_tag==4)  data_edit(users,num_ma);
+        else if(if_tag==5)  num_ma=data_del(users,num_ma);
+        else if(if_tag==6)  data_save_pre(users,num_ma);
         else if(if_tag==0) loop_tag=1;
         finish_windows();
     }
     return 0;
 }
-int welcome_windows()
-{
-    int ww_tag;
-    char usesless_char;
-    printf("---Which function do you want?---\n");
-    printf("1 - List all password information in memory.\n");
-    printf("2 - Add some password to memory.\n");
-    printf("3 - Import some password from the files.\n");
-    printf("4 - Save all password in memory to files.\n");
-    printf("0 - Quit the applications.\n");
-    scanf("%d%c",&ww_tag,&usesless_char);
-    return ww_tag;
-}
+
 int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 {
     char file_name_rd[30]={ '\n' };
@@ -72,6 +45,7 @@ int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 
 int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
 {
+    struct pass_info tmp={ 0 };
     int tag;
     int inc=0,ouc=0,stc=0;
     FILE *rd;
@@ -82,23 +56,42 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
     {
         if(tag==';') 
         {
-            if(ouc==4) 
+            if(ouc==5) 
             {
                 ouc=0;
-                mem_rd->xuhao=stc;
-                rot_pre(mem_rd->origin_pw,strlen(mem_rd->origin_pw),1);
+                mem_rd->xuhao=stc+count_rd;
+                rot_pre(mem_rd->origin_pw,strlen(mem_rd->origin_pw),mem_rd->crypt-48);
+                mem_rd->crypt=97-mem_rd->crypt;
                 stc++;
                 mem_rd=mem_rd+1;
             }
             else ouc++;
             inc=0;
-
         }
-        else if(ouc==0) mem_rd->username[inc++]=tag;
-        else if(ouc==1) mem_rd->origin_pw[inc++]=tag;
-        else if(ouc==2) mem_rd->domains[inc++]=tag;
-        else if(ouc==3) mem_rd->prompt[inc++]=tag;
-        else if(ouc==4) mem_rd->telephone[inc++]=tag;
+        else if(ouc==0) 
+        {
+            mem_rd->username[inc++]=tag;
+        }
+        else if(ouc==1) 
+        {
+            mem_rd->origin_pw[inc++]=tag;
+        }
+        else if(ouc==2) 
+        {
+            mem_rd->domains[inc++]=tag;
+        }
+        else if(ouc==3) 
+        {
+            mem_rd->prompt[inc++]=tag;
+        }
+        else if(ouc==4) 
+        {
+            mem_rd->telephone[inc++]=tag;
+        }
+        else if(ouc==5) 
+        {
+            mem_rd->crypt=tag;
+        }
     }
     fclose(rd);
     return stc+count_rd;
@@ -125,21 +118,75 @@ int data_add(struct pass_info *mem,int count_ad)
         gets(mem->prompt);
         printf("Please enter the telephone (Less than 30 letters) :");
         gets(mem->telephone);
+        mem->crypt = '0';
+        mem->xuhao = count_ad++;
     }
-    return count_ad+flag_ad;
+    return count_ad;
 }
-
 void data_list(struct pass_info *mem_ls, int count_ls)
 {
     int flag;
     printf("There is already %d data in memory.\n",count_ls);
     if(count_ls!=0)
     {
-        printf("Username    Password    Domain  Prompt  Telephone\n");
+        printf("-----------------------------------------------------------------------------\n");
+        printf("No.     Username    Password    Domain      Prompt      Telephone   Crypt/Not\n");
         for(flag=0 ; flag < count_ls ; flag++,mem_ls++)
-            printf("%s  %s  %s  %s  %s\n",mem_ls->username,mem_ls->origin_pw,mem_ls->domains,mem_ls->prompt,mem_ls->telephone);
+            printf("%d  %s  %s  %s  %s  %s  %c\n",mem_ls->xuhao+1,mem_ls->username,mem_ls->origin_pw,mem_ls->domains,mem_ls->prompt,mem_ls->telephone,mem_ls->crypt);
+        printf("-----------------------------------------------------------------------------\n");
     }
 }
+void data_edit(struct pass_info *mem_ed, int count_ed)
+{
+    struct pass_info *tmp;
+    int pic_ed=0;
+    char useless_char;
+    if(count_ed==0) printf("These is no data in memory!\n");
+    else 
+    {
+        printf("Which data do you want to edit?\n");
+        scanf("%d%c",&pic_ed,&useless_char);
+        if(pic_ed<1 || pic_ed > count_ed) printf("You got the wrong number!\n");
+        else
+        {
+            pic_ed--;
+            mem_ed = mem_ed + pic_ed;
+            tmp = mem_ed; 
+            printf("Now input the new password of the date: \n");
+            gets(tmp->origin_pw);
+            mem_ed = tmp;
+            printf("Editing fisnished!\n");
+        }
+    }
+}
+
+int data_del(struct pass_info *mem_dl, int count_dl)
+{
+    int pic_dl, loop_dl;
+    char useless_char;
+    if(count_dl==0) printf("These is no data in memory!\n");
+    else
+    {
+        printf("Which data do you want to delete?\n");
+        scanf("%d%c",&pic_dl,&useless_char);
+        if(pic_dl<1 || pic_dl>count_dl)     printf("You got the wrong number!\n");
+        else
+        {
+            pic_dl--;
+            mem_dl = mem_dl + pic_dl;
+            for(loop_dl=pic_dl;loop_dl<count_dl;loop_dl++)
+            {
+                *mem_dl = *(mem_dl+1);
+                mem_dl->xuhao = mem_dl->xuhao - 1;
+                mem_dl++;
+            }
+            printf("Deleting successfully!\n");
+            count_dl = count_dl - 1;
+        }
+    }
+    return count_dl;
+}
+
 void data_save_pre(struct pass_info *mem_svp, int count_svp)
 {
     char file_name_svp[30]={'\n'};
@@ -169,7 +216,7 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
     {
         fprintf(wr,"%s",mem_sv->username);
         putc(';',wr);
-        rot_pre(mem_sv->origin_pw, strlen(mem_sv->origin_pw),0);    //保存时进行加密
+        rot_pre(mem_sv->origin_pw, strlen(mem_sv->origin_pw),mem_sv->crypt-48);    //保存时进行加密
         fprintf(wr,"%s",mem_sv->origin_pw);
         putc(';',wr);
         fprintf(wr,"%s",mem_sv->domains);
@@ -178,12 +225,8 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
         putc(';',wr);
         fprintf(wr,"%s",mem_sv->telephone);
         putc(';',wr);
+        fprintf(wr,"%c",97-mem_sv->crypt);
+        putc(';',wr);
     }
     fclose(wr);
-}
-void finish_windows()
-{
-    char press_key='\0';
-    printf("Please press [Enter] to continue...\n");
-    while((press_key=getchar())=='\0');
 }
