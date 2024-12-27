@@ -1,25 +1,26 @@
 //简单的换位加密文档
-#include "encry.h"
+#include<stdio.h>
 #include<string.h>
+#include "encry.h"
+
+void rot_pre(char *pr_ch, int long_ch, int rot_fu);     //密码表初始化
+void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch);   //加密模块
+void rot_uncal(char *ca_ch, char *crypt_u_1, char *crypt_u_2, int long_ch);     //解密模块
 
 void rot_pre(char *pr_ch, int long_ch, int rot_fu)
 {
+    FILE *rd_sh;
     int rot_init=0;
-    char crypt_o[62],crypt_c[62];
-    for(rot_init=0;rot_init<62;rot_init++)
+    char crypt_o[LTLONG],crypt_c[LTLONG];
+    for(rot_init=0;rot_init<LTLONG;rot_init++)
     if(rot_init<10)    crypt_o[rot_init]=48+rot_init;
     else if(rot_init<36)   crypt_o[rot_init]=55+rot_init;
-    else if(rot_init<62)   crypt_o[rot_init]=61+rot_init;
-    for(rot_init=0;rot_init<62;rot_init++)
-    {
-        if(rot_init<10) crypt_c[rot_init]=105-crypt_o[rot_init];
-        else if(rot_init<33)   crypt_c[rot_init]=crypt_o[rot_init]+35;
-        else if(rot_init<36)   crypt_c[rot_init]=crypt_o[rot_init]+9;
-        else if(rot_init<39)   crypt_c[rot_init]=crypt_o[rot_init]-9;
-        else crypt_c[rot_init]=crypt_o[rot_init]-35;
-    }
+    else if(rot_init<LTLONG)   crypt_o[rot_init]=61+rot_init;
+    rd_sh=fopen(RO_CONF,"r");
+    fgets(crypt_c,LTLONG+1,rd_sh);
     if(rot_fu==0) rot_cal(pr_ch,crypt_o,crypt_c,long_ch);
     if(rot_fu==1) rot_uncal(pr_ch,crypt_o,crypt_c,long_ch);
+    fclose(rd_sh);
 }
 void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch)
 {
