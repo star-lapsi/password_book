@@ -1,8 +1,13 @@
 #include<stdio.h>
 #include<string.h>
 #include"mainframe.h"
-#include"encrypt\encry.h"
 
+void clean_str(char *temp, int long_tp)
+{
+    int clean_flag=0;
+    for(;clean_flag<long_tp;clean_flag++)
+    temp[clean_flag]='\0';
+}
 int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 {
     char file_name_rd[30]={ '\n' };
@@ -24,7 +29,7 @@ int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 
 int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
 {
-    struct pass_info tmp={ 0 };
+    char tmp[RDMAXL]={ '\0' };
     int tag;
     int inc=0,ouc=0,stc=0;
     FILE *rd;
@@ -33,44 +38,61 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
     if((rd=fopen(rd_name,"r")) != NULL)
     while((tag = getc(rd)) != EOF)
     {
-        if(tag==';') 
+        
+        if(tag==';')
         {
-            if(ouc==5) 
+            if(ouc==0) 
             {
-                ouc=0;
-                mem_rd->xuhao=stc+count_rd;
-                rot_pre(mem_rd->origin_pw,strlen(mem_rd->origin_pw),mem_rd->crypt-48);
-                mem_rd->crypt=97-mem_rd->crypt;
-                stc++;
-                mem_rd=mem_rd+1;
+                long_check(tmp,inc,UNMAXL);
+                strcpy(mem_rd->username,tmp);
+                inc=0;
+                ouc++;
+                clean_str(tmp, strlen(tmp));
             }
-            else ouc++;
-            inc=0;
+            else if(ouc==1) 
+            {
+                long_check(tmp,inc,PWMAXL);
+                strcpy(mem_rd->origin_pw,tmp);
+                inc=0;
+                ouc++;
+                clean_str(tmp, strlen(tmp));
+            }
+            else if(ouc==2) 
+            {
+                long_check(tmp,inc,DMMAXL);
+                strcpy(mem_rd->domains,tmp);
+                inc=0;
+                ouc++;
+                clean_str(tmp, strlen(tmp));
+            }
+            else if(ouc==3) 
+            {
+                long_check(tmp,inc,PPMAXL);
+                strcpy(mem_rd->prompt,tmp);
+                inc=0;
+                ouc++;
+                clean_str(tmp, strlen(tmp));
+            }
+            else if(ouc==4) 
+            {
+                long_check(tmp,inc,TPMAXL);
+                strcpy(mem_rd->telephone,tmp);
+                inc=0;
+                ouc++;
+                clean_str(tmp, strlen(tmp));
+            }
+            else if(ouc==5) 
+            {
+                mem_rd->crypt = tmp[0];
+                mem_rd->xuhao = stc + count_rd;
+                stc++;
+                inc=0;
+                ouc=0;
+                mem_rd = mem_rd + 1;
+                clean_str(tmp, strlen(tmp));
+            }
         }
-        else if(ouc==0) 
-        {
-            mem_rd->username[inc++]=tag;
-        }
-        else if(ouc==1) 
-        {
-            mem_rd->origin_pw[inc++]=tag;
-        }
-        else if(ouc==2) 
-        {
-            mem_rd->domains[inc++]=tag;
-        }
-        else if(ouc==3) 
-        {
-            mem_rd->prompt[inc++]=tag;
-        }
-        else if(ouc==4) 
-        {
-            mem_rd->telephone[inc++]=tag;
-        }
-        else if(ouc==5) 
-        {
-            mem_rd->crypt=tag;
-        }
+        else    tmp[inc++]=tag;
     }
     fclose(rd);
     return stc+count_rd;
@@ -88,82 +110,19 @@ int data_add(struct pass_info *mem_ad,int count_ad)
     {
         printf("Now is the no.%d data\n",flag_ad+1);
         printf("Please enter the username (Less than 20 letters) :");
-        long_check(mem_ad->username, UNMAXL);
+        long_check_rd(mem_ad->username, UNMAXL);
         printf("Please enter the password (Less than 30 letters) :");
-        long_check(mem_ad->origin_pw, PWMAXL);
+        long_check_rd(mem_ad->origin_pw, PWMAXL);
         printf("Please enter the domain (Less than 20 letters) :");
-        long_check(mem_ad->domains, DMMAXL);
+        long_check_rd(mem_ad->domains, DMMAXL);
         printf("Please enter the prompt (Less than 40 letters) :");
-        long_check(mem_ad->prompt, PPMAXL);
+        long_check_rd(mem_ad->prompt, PPMAXL);
         printf("Please enter the telephone (Less than 30 letters) :");
-        long_check(mem_ad->telephone,TPMAXL);
+        long_check_rd(mem_ad->telephone,TPMAXL);
         mem_ad->crypt = '0';
         mem_ad->xuhao = count_ad++;
     }
     return count_ad;
-}
-void data_list(struct pass_info *mem_ls, int count_ls)
-{
-    int flag;
-    printf("There is already %d data in memory.\n",count_ls);
-    if(count_ls!=0)
-    {
-        printf("-----------------------------------------------------------------------------\n");
-        printf("No.     Username    Password    Domain      Prompt      Telephone   Crypt/Not\n");
-        for(flag=0 ; flag < count_ls ; flag++,mem_ls++)
-            printf("%d  %s  %s  %s  %s  %s  %c\n",mem_ls->xuhao+1,mem_ls->username,mem_ls->origin_pw,mem_ls->domains,mem_ls->prompt,mem_ls->telephone,mem_ls->crypt);
-        printf("-----------------------------------------------------------------------------\n");
-    }
-}
-void data_edit(struct pass_info *mem_ed, int count_ed)
-{
-    struct pass_info *tmp;
-    int pic_ed=0;
-    char useless_char;
-    if(count_ed==0) printf("These is no data in memory!\n");
-    else 
-    {
-        printf("Which data do you want to edit?\n");
-        scanf("%d%c",&pic_ed,&useless_char);
-        if(pic_ed<1 || pic_ed > count_ed) printf("You got the wrong number!\n");
-        else
-        {
-            pic_ed--;
-            mem_ed = mem_ed + pic_ed;
-            tmp = mem_ed; 
-            printf("Now input the new password of the date: \n");
-            gets(tmp->origin_pw);
-            mem_ed = tmp;
-            printf("Editing fisnished!\n");
-        }
-    }
-}
-
-int data_del(struct pass_info *mem_dl, int count_dl)
-{
-    int pic_dl, loop_dl;
-    char useless_char;
-    if(count_dl==0) printf("These is no data in memory!\n");
-    else
-    {
-        printf("Which data do you want to delete?\n");
-        scanf("%d%c",&pic_dl,&useless_char);
-        if(pic_dl<1 || pic_dl>count_dl)     printf("You got the wrong number!\n");
-        else
-        {
-            pic_dl--;
-            mem_dl = mem_dl + pic_dl;
-            for(loop_dl=pic_dl;loop_dl<count_dl;loop_dl++)
-            {
-                *mem_dl = *(mem_dl+1);
-                mem_dl->xuhao = mem_dl->xuhao - 1;
-                mem_dl++;
-            }
-            printf("Deleting successfully!\n");
-            count_dl = count_dl - 1;
-        }
-    }
-    return count_dl;
 }
 
 void data_save_pre(struct pass_info *mem_svp, int count_svp)
@@ -195,7 +154,6 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
     {
         fprintf(wr,"%s",mem_sv->username);
         putc(';',wr);
-        rot_pre(mem_sv->origin_pw, strlen(mem_sv->origin_pw),mem_sv->crypt-48);    //保存时进行加密
         fprintf(wr,"%s",mem_sv->origin_pw);
         putc(';',wr);
         fprintf(wr,"%s",mem_sv->domains);
@@ -204,7 +162,7 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
         putc(';',wr);
         fprintf(wr,"%s",mem_sv->telephone);
         putc(';',wr);
-        fprintf(wr,"%c",97-mem_sv->crypt);
+        fprintf(wr,"%c",mem_sv->crypt);
         putc(';',wr);
     }
     fclose(wr);

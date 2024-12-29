@@ -3,11 +3,11 @@
 #include<string.h>
 #include "encry.h"
 
-void rot_pre(char *pr_ch, int long_ch, int rot_fu);     //密码表初始化
+void rot_pre(char *pr_ch, int long_ch, char rot_fu);     //密码表初始化
 void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch);   //加密模块
 void rot_uncal(char *ca_ch, char *crypt_u_1, char *crypt_u_2, int long_ch);     //解密模块
 
-void rot_pre(char *pr_ch, int long_ch, int rot_fu)
+void rot_pre(char *pr_ch, int long_ch, char rot_fu)
 {
     FILE *rd_sh;
     int rot_init=0;
@@ -17,10 +17,10 @@ void rot_pre(char *pr_ch, int long_ch, int rot_fu)
     else if(rot_init<36)   crypt_o[rot_init]=55+rot_init;
     else if(rot_init<LTLONG)   crypt_o[rot_init]=61+rot_init;
     rd_sh=fopen(RO_CONF,"r");
-    fgets(crypt_c,LTLONG+1,rd_sh);
-    if(rot_fu==0) rot_cal(pr_ch,crypt_o,crypt_c,long_ch);
-    if(rot_fu==1) rot_uncal(pr_ch,crypt_o,crypt_c,long_ch);
+    fgets(crypt_c,LTLONG,rd_sh);
     fclose(rd_sh);
+    if(rot_fu=='1') rot_cal(pr_ch,crypt_o,crypt_c,long_ch);
+    if(rot_fu=='0') rot_uncal(pr_ch,crypt_o,crypt_c,long_ch);
 }
 void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch)
 {
