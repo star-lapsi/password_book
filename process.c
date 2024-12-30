@@ -6,13 +6,15 @@
 void data_list(struct pass_info *mem_ls, int count_ls)
 {
     int flag;
+    const char *list_head[7]={"No.","Username","Password","Domain","Prompt","Telephone","Crypt"};
     printf("There is already %d data in memory.\n",count_ls);
     if(count_ls!=0)
     {
         printf("-----------------------------------------------------------------------------\n");
-        printf("No.     Username    Password    Domain      Prompt      Telephone   Crypt/Not\n");
+        printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+        printf("\n");
         for(flag=0 ; flag < count_ls ; flag++,mem_ls++)
-            printf("%d  %s  %s  %s  %s  %s  %c\n",mem_ls->xuhao+1,mem_ls->username,mem_ls->origin_pw,mem_ls->domains,mem_ls->prompt,mem_ls->telephone,mem_ls->crypt);
+            printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",mem_ls->xuhao+1,mem_ls->username,mem_ls->origin_pw,mem_ls->domains,mem_ls->prompt,mem_ls->telephone,mem_ls->crypt);
         printf("-----------------------------------------------------------------------------\n");
     }
 }

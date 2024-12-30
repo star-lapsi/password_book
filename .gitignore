@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 .vscode/
 .dist/
-项目文档/
+.proj/
 
 # Several Test Files
 *.txt
