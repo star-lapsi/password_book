@@ -18,6 +18,39 @@ void data_list(struct pass_info *mem_ls, int count_ls)
         printf("-----------------------------------------------------------------------------\n");
     }
 }
+void data_search(struct pass_info *mem_sc, int count_sc)
+{
+    int rd_flag=0,sc_flag=0,sc_wt=0;
+    struct pass_info *sc_tag;
+    char sc_tp, sc_in[UNMAXL];
+    const char *list_head[7]={"No.","Username","Password","Domain","Prompt","Telephone","Crypt"};
+    printf("Please type the name you want to search.\n");
+    while(((sc_tp=getchar())!='\n')&&rd_flag<UNMAXL)   sc_in[rd_flag++]=sc_tp;
+    sc_in[rd_flag]='\0';
+    printf("%d %s",strlen(sc_in),sc_in);
+    while((sc_flag<count_sc)&&(sc_wt==0))
+    {
+        sc_tag = mem_sc + sc_flag;
+        if(strcmp(sc_in,sc_tag->username)==0)  sc_wt=1;
+        sc_flag++;
+    }
+    if(sc_wt==0) printf("Data with this name %s is not exist.\n",sc_in);
+    else
+    {
+        printf("-----------------------------------------------------------------------------\n");
+        printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+        printf("\n");
+        for(sc_flag=0;sc_flag<count_sc;sc_flag++)
+        {
+            sc_tag = mem_sc + sc_flag;
+            if(strcmp(sc_in,sc_tag->username)==0)  
+                printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",sc_tag->xuhao+1,sc_tag->username,sc_tag->origin_pw,sc_tag->domains,sc_tag->prompt,sc_tag->telephone,sc_tag->crypt);
+        }
+        printf("-----------------------------------------------------------------------------\n");
+    }
+}
+
+
 void data_edit(struct pass_info *mem_ed, int count_ed)
 {
     struct pass_info *tmp;

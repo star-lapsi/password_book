@@ -1,10 +1,10 @@
-#define UNMAXL 20
-#define PWMAXL 30
-#define DMMAXL 20
-#define PPMAXL 40
-#define TPMAXL 20
-#define MMMAXL 50
-#define RDMAXL 100
+#define UNMAXL 20   //名称字段最长限制
+#define PWMAXL 30   //密码字段最长限制
+#define DMMAXL 20   //域名字段最长限制
+#define PPMAXL 40   //提示字段最长限制
+#define TPMAXL 20   //电话字段最长限制
+#define MMMAXL 500  //总数据量最长限制
+#define RDMAXL 100  //单字段最长限制
 
 struct pass_info {
     int xuhao;
@@ -31,6 +31,7 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv);  //写入
 
 int data_del(struct pass_info *mem_dl, int count_dl);   //删除对应数据
 void data_list(struct pass_info *mem_ls, int count_ls);   //展示当前数据
+void data_search(struct pass_info *mem_sc, int count_sc);   //按名称检索数据（不支持模糊查询）
 void data_edit(struct pass_info *mem_ed, int count_ed);   //编辑具体数据
 void data_ep_pre(struct pass_info *mem_enp, int count_en_p); //加解密前准备
 void date_enc(struct pass_info *mem_en);  //加密具体数据
