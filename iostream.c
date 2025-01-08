@@ -2,12 +2,6 @@
 #include<string.h>
 #include"mainframe.h"
 
-void clean_str(char *temp, int long_tp)
-{
-    int clean_flag=0;
-    for(;clean_flag<long_tp;clean_flag++)
-    temp[clean_flag]='\0';
-}
 int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 {
     char file_name_rd[30]={ '\n' };
@@ -21,7 +15,7 @@ int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
     if(rd_flag==0) printf("Error, The file name is blank!\n");
     else 
     {
-        printf("The importing file name is %s.\n",file_name_rd);
+        printf("The importing file name is \"%s\".\n",file_name_rd);
         rd_count=data_read_from_file(mem_rdp, file_name_rd, count_rd_p);
     }
     return rd_count;
@@ -36,8 +30,8 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
     mem_rd=mem_rd+count_rd;
     if((rd=fopen(rd_name,"r")) == NULL) 
     {
-        printf("Can't find the file:\"%s\".\n",rd_name);
-        return 0;
+        printf("Can't find the file: \"%s\".\n",rd_name);
+        return count_rd;
     }
     else
     {

@@ -33,6 +33,4 @@ int data_del(struct pass_info *mem_dl, int count_dl);   //删除对应数据
 void data_list(struct pass_info *mem_ls, int count_ls);   //展示当前数据
 void data_search(struct pass_info *mem_sc, int count_sc);   //按名称检索数据（支持单字段模糊查询）
 void data_edit(struct pass_info *mem_ed, int count_ed);   //编辑具体数据
-void data_ep_pre(struct pass_info *mem_enp, int count_en_p); //加解密前准备
-void date_enc(struct pass_info *mem_en);  //加密具体数据
-void date_dec(struct pass_info *mem_de);  //解密具体数据
+void data_enc_pre(struct pass_info *mem_enp, int count_en_p); //加解密前准备

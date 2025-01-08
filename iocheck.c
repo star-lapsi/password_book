@@ -21,3 +21,10 @@ void long_check(char *long_str, int long_sr, int long_lm)
     if(loop_ck == long_lm) printf("It's too long, string will be cut to %d long.\n", long_lm);
     *(long_str + loop_ck) = '\0';
 }
+
+void clean_str(char *temp, int long_tp)
+{
+    int clean_flag=0;
+    for(;clean_flag<long_tp;clean_flag++)
+    temp[clean_flag]='\0';
+}
