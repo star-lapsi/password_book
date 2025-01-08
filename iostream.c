@@ -41,6 +41,16 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
         
             if(tag==';')
             {
+                mem_rd->crypt = tmp[0];
+                mem_rd->xuhao = stc + count_rd;
+                stc++;
+                inc=0;
+                ouc=0;
+                mem_rd = mem_rd + 1;
+                clean_str(tmp, strlen(tmp));
+            }
+            else if(tag==',')
+            {
                 if(ouc==0) 
                 {
                     long_check(tmp,inc,UNMAXL);
@@ -81,18 +91,8 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
                     ouc++;
                     clean_str(tmp, strlen(tmp));
                 }
-                else if(ouc==5) 
-                {
-                    mem_rd->crypt = tmp[0];
-                    mem_rd->xuhao = stc + count_rd;
-                    stc++;
-                    inc=0;
-                    ouc=0;
-                    mem_rd = mem_rd + 1;
-                    clean_str(tmp, strlen(tmp));
-                }
             }
-            else    tmp[inc++]=tag;
+            else if(tag!='\n')  tmp[inc++]=tag;
         }
     fclose(rd);
     return stc+count_rd;
@@ -156,15 +156,15 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
         for(sv_flag=0 ; sv_flag < count_sv ; sv_flag++ , mem_sv++)
         {
             fprintf(wr,"%s",mem_sv->username);
-            putc(';',wr);
+            putc(',',wr);
             fprintf(wr,"%s",mem_sv->origin_pw);
-            putc(';',wr);
+            putc(',',wr);
             fprintf(wr,"%s",mem_sv->domains);
-            putc(';',wr);
+            putc(',',wr);
             fprintf(wr,"%s",mem_sv->prompt);
-            putc(';',wr);
+            putc(',',wr);
             fprintf(wr,"%s",mem_sv->telephone);
-            putc(';',wr);
+            putc(',',wr);
             fprintf(wr,"%c",mem_sv->crypt);
             putc(';',wr);
         }
