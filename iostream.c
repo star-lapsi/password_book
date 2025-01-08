@@ -130,18 +130,22 @@ void data_save_pre(struct pass_info *mem_svp, int count_svp)
 {
     char file_name_svp[30]={'\n'};
     int svp_tag,svp_flag=0;
-    printf("Please Input the file name:\n");
-    while((svp_tag=getchar())!='\n')
+    if(count_svp==0)    printf("These is no data in memory, saving failed.\n");
+    else
     {
-        file_name_svp[svp_flag]=svp_tag;
-        svp_flag++;
-    }
-    if(svp_flag==0) printf("Error, The file name is blank!\n");
-    else 
-    {
-        printf("The saving file name is %s.\n",file_name_svp);
-        data_save(mem_svp, file_name_svp, count_svp);
-        printf("Saving successfully!\n");
+        printf("Please Input the file name:\n");
+        while((svp_tag=getchar())!='\n')
+        {
+            file_name_svp[svp_flag]=svp_tag;
+            svp_flag++;
+        }
+        if(svp_flag==0) printf("Error, The file name is blank!\n");
+        else 
+        {
+            printf("The saving file name is %s.\n",file_name_svp);
+            data_save(mem_svp, file_name_svp, count_svp);
+            printf("Saving successfully!\n");
+        }
     }
 }
 
@@ -167,6 +171,7 @@ void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv)
             putc(',',wr);
             fprintf(wr,"%c",mem_sv->crypt);
             putc(';',wr);
+            putc('\n',wr);
         }
         fclose(wr);
     }
