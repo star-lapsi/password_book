@@ -2,23 +2,23 @@
 #include<string.h>
 #include"mainframe.h"
 
+int data_read_boot(struct pass_info *mem_main, int count_main)
+{
+    char file_name_rd[]={"original.txt"};
+    int drb_count=0;
+    printf("Waiting for importing original password database...\n");
+    drb_count=data_read_from_file(mem_main,file_name_rd,count_main);
+    return drb_count;
+}
+
 int data_read_pre(struct pass_info *mem_rdp, int count_rd_p)
 {
     char file_name_rd[30]={ '\n' };
-    int rd_tag,rd_flag=0,rd_count;
+    int rd_tag,rd_flag=0,prd_count;
     printf("Please Input the file name:\n");
-    while((rd_tag=getchar())!='\n')
-    {
-        file_name_rd[rd_flag]=rd_tag;
-        rd_flag++;
-    }
-    if(rd_flag==0) printf("Error, The file name is blank!\n");
-    else 
-    {
-        printf("The importing file name is \"%s\".\n",file_name_rd);
-        rd_count=data_read_from_file(mem_rdp, file_name_rd, count_rd_p);
-    }
-    return rd_count;
+    while((rd_tag=getchar())!='\n')     file_name_rd[rd_flag]=rd_tag;
+    prd_count=data_read_from_file(mem_rdp, file_name_rd, count_rd_p);
+    return prd_count;
 }
 
 int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
@@ -27,75 +27,83 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
     int tag;
     int inc=0,ouc=0,stc=0;
     FILE *rd;
-    mem_rd=mem_rd+count_rd;
-    if((rd=fopen(rd_name,"r")) == NULL) 
-    {
-        printf("Can't find the file: \"%s\".\n",rd_name);
+    if(strlen(rd_name)==0) 
+    {   
+        printf("Error, The file name is blank!\n");
         return count_rd;
     }
-    else
+    else 
     {
-        printf("Starting to import from file....\n");
-        while((tag = getc(rd)) != EOF)
+        mem_rd=mem_rd+count_rd;
+        printf("The importing file name is \"%s\".\n",rd_name);
+        if((rd=fopen(rd_name,"r")) == NULL) 
         {
-        
-            if(tag==';')
-            {
-                mem_rd->crypt = tmp[0];
-                mem_rd->xuhao = stc + count_rd;
-                stc++;
-                inc=0;
-                ouc=0;
-                mem_rd = mem_rd + 1;
-                clean_str(tmp, strlen(tmp));
-            }
-            else if(tag==',')
-            {
-                if(ouc==0) 
-                {
-                    long_check(tmp,inc,UNMAXL);
-                    strcpy(mem_rd->username,tmp);
-                    inc=0;
-                    ouc++;
-                    clean_str(tmp, strlen(tmp));
-                }
-                else if(ouc==1) 
-                {
-                    long_check(tmp,inc,PWMAXL);
-                    strcpy(mem_rd->origin_pw,tmp);
-                    inc=0;
-                    ouc++;
-                    clean_str(tmp, strlen(tmp));
-                }
-                else if(ouc==2) 
-                {
-                    long_check(tmp,inc,DMMAXL);
-                    strcpy(mem_rd->domains,tmp);
-                    inc=0;
-                    ouc++;
-                    clean_str(tmp, strlen(tmp));
-                }
-                else if(ouc==3) 
-                {
-                    long_check(tmp,inc,PPMAXL);
-                    strcpy(mem_rd->prompt,tmp);
-                    inc=0;
-                    ouc++;
-                    clean_str(tmp, strlen(tmp));
-                }
-                else if(ouc==4) 
-                {
-                    long_check(tmp,inc,TPMAXL);
-                    strcpy(mem_rd->telephone,tmp);
-                    inc=0;
-                    ouc++;
-                    clean_str(tmp, strlen(tmp));
-                }
-            }
-            else if(tag!='\n')  tmp[inc++]=tag;
+            printf("Can't find the file: \"%s\".\n",rd_name);
+            return count_rd;
         }
-    fclose(rd);
-    return stc+count_rd;
+        else
+        {
+            printf("Starting to import from file....\n");
+            while((tag = getc(rd)) != EOF)
+            {        
+                if(tag==';')
+                {
+                    mem_rd->crypt = tmp[0];
+                    mem_rd->xuhao = stc + count_rd;
+                    stc++;
+                    inc=0;
+                    ouc=0;
+                    mem_rd = mem_rd + 1;
+                    clean_str(tmp, strlen(tmp));
+                }
+                else if(tag==',')
+                {
+                    if(ouc==0) 
+                    {
+                        long_check(tmp,inc,UNMAXL);
+                        strcpy(mem_rd->username,tmp);
+                        inc=0;
+                        ouc++;
+                        clean_str(tmp, strlen(tmp));
+                    }
+                    else if(ouc==1) 
+                    {
+                        long_check(tmp,inc,PWMAXL);
+                        strcpy(mem_rd->origin_pw,tmp);
+                        inc=0;
+                        ouc++;
+                        clean_str(tmp, strlen(tmp));
+                    }
+                    else if(ouc==2) 
+                    {
+                        long_check(tmp,inc,DMMAXL);
+                        strcpy(mem_rd->domains,tmp);
+                        inc=0;
+                        ouc++;
+                        clean_str(tmp, strlen(tmp));
+                    }
+                    else if(ouc==3) 
+                    {
+                        long_check(tmp,inc,PPMAXL);
+                        strcpy(mem_rd->prompt,tmp);
+                        inc=0;
+                        ouc++;
+                        clean_str(tmp, strlen(tmp));
+                    }
+                    else if(ouc==4) 
+                    {
+                        long_check(tmp,inc,TPMAXL);
+                        strcpy(mem_rd->telephone,tmp);
+                        inc=0;
+                        ouc++;
+                        clean_str(tmp, strlen(tmp));
+                    }
+                }
+                else if(tag!='\n')  tmp[inc++]=tag;
+            }
+        fclose(rd);
+        return count_rd+stc;
+        }
     }
 }
 
