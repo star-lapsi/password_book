@@ -5,7 +5,7 @@
 #define TPMAXL 20       //电话字段最长限制
 #define MMMAXL 500      //总数据量最长限制
 #define RDMAXL 100      //单字段最长限制
-#define PAGE_SIZE 5    //每页显示数据数量
+#define PAGE_SIZE 10    //每页显示数据数量
 
 struct pass_info {
     int xuhao;
@@ -17,9 +17,10 @@ struct pass_info {
     char crypt; //确认数据的加密类型
 };
 
-void long_check_rd(char *long_str, int long_lm);   //手动输入字符串长度校验
-void long_check(char *long_str, int long_sr, int long_lm);      //字符串长度校验
+int input_str_with_check(char *long_str, int long_lm);   //手动输入字符串（含长度校验）
+int long_check(char *long_str, int long_sr, int long_lm);      //字符串长度校验
 void clean_str(char *temp, int long_tp);     //清除字符串内容
+
 
 int init_failure(void);         //启动界面
 int db_operate(void);         //数据库操作界面
@@ -33,6 +34,7 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd); 
 int data_add(struct pass_info *mem_ad, int count_ad);  //手动添加数据
 void data_save_pre(struct pass_info *mem_svp, int count_svp);    //写入数据准备
 void data_save(struct pass_info *mem_sv, char *sv_name, int count_sv);  //写入文件函数
+int random_num(char *mem_rn, int long_str);    //产生固定长度的随机字符串
 
 int data_del(struct pass_info *mem_dl, int count_dl);   //删除对应数据
 void data_list(struct pass_info *mem_ls, int count_ls);   //展示当前数据

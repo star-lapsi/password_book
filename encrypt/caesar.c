@@ -3,10 +3,9 @@
 #include<string.h>
 #include "encry.h"
 
-int rot_pre(char *pr_ch, int long_ch, char rot_fu)
+int caesar_pre(char *pr_ch, int long_ch, char caesar_flag)
 {
     FILE *rd_sh;
-    int rot_init=0;
     char crypt_o[LTLONG],crypt_c[LTLONG];
     if((rd_sh=fopen(RO_CONF,"r"))==NULL)
     {
@@ -20,19 +19,20 @@ int rot_pre(char *pr_ch, int long_ch, char rot_fu)
         fgets(crypt_o,128,rd_sh);
         fgets(crypt_c,128,rd_sh);
         fclose(rd_sh);
-        if(rot_fu=='0') 
+        if(caesar_flag=='0') 
         {
-            rot_cal(pr_ch,crypt_o,crypt_c,long_ch);
+            caesar_enc(pr_ch,crypt_o,crypt_c,long_ch);
             return 1;
         }
-        if(rot_fu=='1') 
+        if(caesar_flag=='1') 
         {
-            rot_recal(pr_ch,crypt_o,crypt_c,long_ch);
+            caesar_dec(pr_ch,crypt_o,crypt_c,long_ch);
             return 0;
         }
     }
 }
-void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch)
+
+void caesar_enc(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch)
 {
     int cal_flag,pic_flag=0;
     for(cal_flag = 0 ; cal_flag < long_ch ; cal_flag++)
@@ -43,10 +43,11 @@ void rot_cal(char *ca_ch, char *crypt_e_1, char *crypt_e_2, int long_ch)
             pic_flag=0;
         }
 }
-void rot_recal(char *ca_ch, char *crypt_u_1, char *crypt_u_2, int long_ch)
+
+void caesar_dec(char *ca_ch, char *crypt_u_1, char *crypt_u_2, int long_ch)
 {
     int uncal_flag,pic_flag=0;
-    for(uncal_flag=0;uncal_flag<long_ch;uncal_flag++)
+    for(uncal_flag = 0 ; uncal_flag < long_ch ; uncal_flag++)
         if((ca_ch[uncal_flag]<='9'&&ca_ch[uncal_flag]>='0')||(ca_ch[uncal_flag]<='z'&&ca_ch[uncal_flag]>='a')||(ca_ch[uncal_flag]<='Z'&&ca_ch[uncal_flag]>='A'))
         {
             while(crypt_u_2[pic_flag]!=ca_ch[uncal_flag]) pic_flag++;

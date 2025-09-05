@@ -10,8 +10,6 @@ int main()
     int num_ma=0;
     int boot_flag=0,loop_tag=0,data_flag=0,edit_flag=0;
     int default_db=0;
-    int save_flag=0;
-    char useless_char;
     printf("Welcome to this simple password manager.\n");
     while(boot_flag==0)
     {
@@ -88,7 +86,7 @@ int db_operate(void)
     printf("2 - Building a new password database.\n");
     printf("0 - Quit the applications.\n");
     scanf("%d%c",&wd_tag,&useless_char);
-//    system("cls");
+    system("cls");
     return wd_tag;
 }
 

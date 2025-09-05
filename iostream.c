@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<windows.h>
 #include"mainframe.h"
 
 int data_read_boot(struct pass_info *mem_main, int count_main)
@@ -109,29 +110,73 @@ int data_read_from_file(struct pass_info *mem_rd, char *rd_name, int count_rd)
 
 int data_add(struct pass_info *mem_ad,int count_ad)
 {
-    int flag_ad,num_ad;
+    int flag_ad,num_ad,check_ad[5]={0,0,0,0,0};
+    int pw_create;
     char useless_char;
-    printf("There is already %d data in memory.\n",count_ad);
     printf("How many users do you want to add?\n");
     scanf("%d%c",&num_ad,&useless_char);
     mem_ad = mem_ad + count_ad;
     for(flag_ad = 0 ; flag_ad < num_ad ; flag_ad++, mem_ad++)
     {
         printf("Now is the no.%d data\n",flag_ad+1);
-        printf("Please enter the username (Less than 20 letters) :");
-        long_check_rd(mem_ad->username, UNMAXL);
-        printf("Please enter the password (Less than 30 letters) :");
-        long_check_rd(mem_ad->origin_pw, PWMAXL);
-        printf("Please enter the domain (Less than 20 letters) :");
-        long_check_rd(mem_ad->domains, DMMAXL);
-        printf("Please enter the prompt (Less than 40 letters) :");
-        long_check_rd(mem_ad->prompt, PPMAXL);
-        printf("Please enter the telephone (Less than 30 letters) :");
-        long_check_rd(mem_ad->telephone,TPMAXL);
+        while(check_ad[0] == 0)
+        {        
+            printf("Please enter the username (Less than 20 letters) :");
+            check_ad[0] = input_str_with_check(mem_ad->username, UNMAXL);
+            system("cls");
+        }
+        while(check_ad[1] == 0)
+        {
+            printf("Choose the way to input password:\n");
+            printf("1 - Input manually.\n");
+            printf("0 - Create a 16bit random password.\n");
+            scanf("%d%c",&pw_create,&useless_char);
+            if(pw_create == 1)
+            {
+                printf("Please enter the password (Less than 30 letters) :");
+                check_ad[1] = input_str_with_check(mem_ad->origin_pw, PWMAXL);
+                system("cls");
+            }
+            else if(pw_create == 0)
+            {
+                printf("Creating a random password now.\n");
+                check_ad[1] = random_num(mem_ad->origin_pw,16);
+                Sleep(500);
+                system("cls");
+            }
+            else    printf("Wrong option.\n");
+        }
+        while(check_ad[2]==0)
+        {
+            printf("Please enter the domain (Less than 20 letters) :");
+            check_ad[2] = input_str_with_check(mem_ad->domains, DMMAXL);
+            system("cls");
+        }
+        while(check_ad[3]==0)
+        {
+            printf("Please enter the prompt (Less than 40 letters) :");
+            check_ad[3] = input_str_with_check(mem_ad->prompt, PPMAXL);
+            system("cls");
+        }
+        while(check_ad[4]==0)
+        {
+            printf("Please enter the telephone (Less than 30 letters) :");
+            check_ad[4] = input_str_with_check(mem_ad->telephone,TPMAXL);
+            system("cls");
+        }
         mem_ad->crypt = '0';
         mem_ad->xuhao = count_ad++;
     }
     return count_ad;
+}
+
+int random_num(char *mem_rn, int long_str)
+{
+    char candidate[] = {"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    int i;
+    for(i = 0 ; i < long_str ; i++)
+        *(mem_rn + i) = candidate[(rand() % strlen(candidate))];
+    return 1;
 }
 
 void data_save_pre(struct pass_info *mem_svp, int count_svp)

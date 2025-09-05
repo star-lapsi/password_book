@@ -10,7 +10,7 @@ int data_operate(void)
     char usesless_char;
     printf("---Which function do you want?---\n");
     printf("1 - List all password information in database.\n");
-    printf("2 - Add some password into database.\n");
+    printf("2 - Add new password data to database.\n");
     printf("3 - Import some password from the files.\n");
     printf("4 - Search data from the database.\n");
     printf("5 - Edit a password in database.\n");
@@ -58,53 +58,158 @@ void data_list(struct pass_info *mem_ls, int count_ls)
     }
     else        printf("There is no data in memory.\n");
 }
+
 void data_search(struct pass_info *mem_sc, int count_sc)
 {
     int rd_flag=0,lp_o=0,lp_i,lp_m,lp_f=0,un_design;
     int sc_flag[MMMAXL];
+    int type_flag=0,num_flag=0;
+    char useless_char;
     struct pass_info *sc_tag;
     char sc_tp, sc_in[UNMAXL],sc_cut[UNMAXL];
     const char *list_head[7]={"No.","Username","Password","Domain","Prompt","Telephone","Crypt"};
     sc_flag[0]=0;
-    printf("Please type the name you want to search.\n");
-    while(((sc_tp=getchar())!='\n') && rd_flag < UNMAXL)   
-        sc_in[rd_flag++]=sc_tp;
-    sc_in[rd_flag]='\0';
-    while(lp_o < count_sc)
+    printf("Which kind do you want to search.\n");
+    printf("1 - By serial number.\n");
+    printf("2 - By username.\n");
+    printf("3 - By domain.\n");
+    printf("4 - By telephone number.\n");
+    scanf("%d%c",&type_flag,&useless_char);
+    if(type_flag == 1) 
     {
-        lp_i=0;
-        sc_tag = mem_sc + lp_o;
-        un_design = strlen(sc_tag->username)-strlen(sc_in);
-        while(lp_i <= un_design && lp_i > -1)
+        printf("Please input the serial number you want to search.\n");
+        scanf("%d%c",&num_flag,&useless_char);
+        if(num_flag > count_sc && num_flag < 1) printf("You input wrong serial number.\n");
+        else
         {
-            for(lp_m=0;lp_m<strlen(sc_in);lp_m++)   
-                sc_cut[lp_m]=sc_tag->username[lp_i+lp_m];
-            if(strcmp(sc_in,sc_cut)==0) 
-            {
-                sc_flag[lp_f++]=lp_o+1;
-                lp_i=-1;
-                clean_str(sc_cut, UNMAXL);
-            }
-            else 
-            {
-                lp_i++;
-                clean_str(sc_cut, UNMAXL);
-            }
+            mem_sc = mem_sc + num_flag - 1;
+            printf("-----------------------------------------------------------------------------\n");
+            printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+            printf("\n");
+            printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",mem_sc->xuhao+1,mem_sc->username,mem_sc->origin_pw,mem_sc->domains,mem_sc->prompt,mem_sc->telephone,mem_sc->crypt);
+            printf("-----------------------------------------------------------------------------\n");
         }
-        lp_o++;
     }
-    if(sc_flag[0]==0) printf("Data with this name '%s' is not exist.\n",sc_in);
-    else
+    else if(type_flag < 5 && type_flag > 1)
     {
-        printf("-----------------------------------------------------------------------------\n");
-        printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
-        printf("\n");
-        for(lp_o=0;lp_o < lp_f;lp_o++)
+        type_flag = type_flag * 2 - 3;
+        printf("Please input the %s you want to search.\n",list_head[type_flag]);
+        while(((sc_tp=getchar())!='\n') && rd_flag < UNMAXL)   sc_in[rd_flag++]=sc_tp;
+        sc_in[rd_flag]='\0';
+        if(type_flag == 1)
         {
-            sc_tag = mem_sc + sc_flag[lp_o] - 1; 
-            printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",sc_tag->xuhao+1,sc_tag->username,sc_tag->origin_pw,sc_tag->domains,sc_tag->prompt,sc_tag->telephone,sc_tag->crypt);
+            while(lp_o < count_sc)
+            {
+                lp_i=0;
+                sc_tag = mem_sc + lp_o;
+                un_design = strlen(sc_tag->username)-strlen(sc_in);
+                while(lp_i <= un_design && lp_i > -1)
+                {
+                    for(lp_m=0;lp_m<strlen(sc_in);lp_m++)   sc_cut[lp_m]=sc_tag->username[lp_i+lp_m];
+                    if(strcmp(sc_in,sc_cut)==0) 
+                    {
+                        sc_flag[lp_f++]=lp_o+1;
+                        lp_i=-1;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                    else 
+                    {
+                        lp_i++;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                }
+                lp_o++;
+            }
+            if(sc_flag[0]==0) printf("Data with this name '%s' is not exist.\n",sc_in);
+            else
+            {
+                printf("-----------------------------------------------------------------------------\n");
+                printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+                printf("\n");
+                for(lp_o=0;lp_o < lp_f;lp_o++)
+                {
+                    sc_tag = mem_sc + sc_flag[lp_o] - 1; 
+                    printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",sc_tag->xuhao+1,sc_tag->username,sc_tag->origin_pw,sc_tag->domains,sc_tag->prompt,sc_tag->telephone,sc_tag->crypt);
+                }
+                printf("-----------------------------------------------------------------------------\n");
+            }
         }
-        printf("-----------------------------------------------------------------------------\n");
+        else if(type_flag == 3)
+        {
+            while(lp_o < count_sc)
+            {
+                lp_i=0;
+                sc_tag = mem_sc + lp_o;
+                un_design = strlen(sc_tag->domains)-strlen(sc_in);
+                while(lp_i <= un_design && lp_i > -1)
+                {
+                    for(lp_m=0;lp_m<strlen(sc_in);lp_m++)   sc_cut[lp_m]=sc_tag->domains[lp_i+lp_m];
+                    if(strcmp(sc_in,sc_cut)==0) 
+                    {
+                        sc_flag[lp_f++]=lp_o+1;
+                        lp_i=-1;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                    else 
+                    {
+                        lp_i++;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                }
+                lp_o++;
+            }
+            if(sc_flag[0]==0) printf("Data with this name '%s' is not exist.\n",sc_in);
+            else
+            {
+                printf("-----------------------------------------------------------------------------\n");
+                printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+                printf("\n");
+                for(lp_o=0;lp_o < lp_f;lp_o++)
+                {
+                    sc_tag = mem_sc + sc_flag[lp_o] - 1; 
+                    printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",sc_tag->xuhao+1,sc_tag->username,sc_tag->origin_pw,sc_tag->domains,sc_tag->prompt,sc_tag->telephone,sc_tag->crypt);
+                }
+                printf("-----------------------------------------------------------------------------\n");
+            }
+        }
+        else if(type_flag == 5)
+        {
+            while(lp_o < count_sc)
+            {
+                lp_i=0;
+                sc_tag = mem_sc + lp_o;
+                un_design = strlen(sc_tag->telephone)-strlen(sc_in);
+                while(lp_i <= un_design && lp_i > -1)
+                {
+                    for(lp_m=0;lp_m<strlen(sc_in);lp_m++)   sc_cut[lp_m]=sc_tag->telephone[lp_i+lp_m];
+                    if(strcmp(sc_in,sc_cut)==0) 
+                    {
+                        sc_flag[lp_f++]=lp_o+1;
+                        lp_i=-1;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                    else 
+                    {
+                        lp_i++;
+                        clean_str(sc_cut, UNMAXL);
+                    }
+                }
+                lp_o++;
+            }
+            if(sc_flag[0]==0) printf("Data with this name '%s' is not exist.\n",sc_in);
+            else
+            {
+                printf("-----------------------------------------------------------------------------\n");
+                printf("%-5.3s%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.5s\n",list_head[0],list_head[1],list_head[2],list_head[3],list_head[4],list_head[5],list_head[6]);
+                printf("\n");
+                for(lp_o=0;lp_o < lp_f;lp_o++)
+                {
+                    sc_tag = mem_sc + sc_flag[lp_o] - 1; 
+                    printf("%-5d%-15.12s%-18.15s%-20.15s%-20.15s%-15.13s%-5.2c\n",sc_tag->xuhao+1,sc_tag->username,sc_tag->origin_pw,sc_tag->domains,sc_tag->prompt,sc_tag->telephone,sc_tag->crypt);
+                }
+                printf("-----------------------------------------------------------------------------\n");
+            }
+        }
     }
 }
 
@@ -124,8 +229,9 @@ void data_edit(struct pass_info *mem_ed, int count_ed)
             pic_ed--;
             mem_ed = mem_ed + pic_ed;
             tmp = mem_ed; 
-            printf("Now input the new password of the date: \n");
+            printf("Now input the new password: \n");
             gets(tmp->origin_pw);
+            tmp->crypt = '0';
             mem_ed = tmp;
             printf("Editing fisnished!\n");
         }
